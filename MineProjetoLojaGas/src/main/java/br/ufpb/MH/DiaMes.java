@@ -1,0 +1,8 @@
+package br.ufpb.MH;
+
+public enum DiaMes {
+
+    DIA_01, DIA_02, DIA_03, DIA_04, DIA_05, DIA_06, DIA_07, DIA_08, DIA_09, DIA_10,
+    DIA_11, DIA_12, DIA_13, DIA_14, DIA_15, DIA_16, DIA_17, DIA_18, DIA_19, DIA_20,
+    DIA_21, DIA_22, DIA_23, DIA_24, DIA_25, DIA_26, DIA_27, DIA_28, DIA_29, DIA_30, DIA_31;
+}
