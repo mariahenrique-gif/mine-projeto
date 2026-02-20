@@ -1,34 +1,38 @@
 package br.ufpb.MH;
 
 import java.io.IOException;
-import java.util.Collection;
 
 public interface SistemaJL {
 
-    public void registrarVenda(DiaMes dia, String produto, double valor, int idFuncionario)
-            throws FuncionarioInexistenteException;
-
-    public void registrarGasto(DiaMes dia, String descricao, double valor)
+    // FINANCEIRO
+    void registrarGasto(String descricao, double valor)
             throws SaldoInsuficienteException;
 
-    public void exibirRelatorioFinanceiro();
+    void exibirRelatorioFinanceiro();
 
-    public void cadastrarContato(Contato c)
+    // AGENDA DE CONTATOS
+    void cadastrarContato(Contato c)
             throws ContatoJaExisteException;
 
-    public Contato localizarContato(String nome)
+    Contato localizarContato(String nome)
             throws ContatoInexistenteExeption;
 
-    public boolean excluirContato(String nome)
+    boolean excluirContato(String nome)
             throws ContatoInexistenteExeption;
 
-    public void admitirFuncionario(Funcionario f)
-            throws IdDuplicadoException, FuncionarioJaExisteException;
+    void exibirAgendaDeContatos();
 
-    public Funcionario buscarFuncionario(int id)
-            throws FuncionarioInexistenteException;
+    // ESTOQUE
+    void registrarVenda(Estoque produto, int quantidade)
+            throws EstoqueInsuficienteException;
 
-    public void salvarEstadoDoSistema() throws IOException;
+    void registrarCompra(Estoque produto, int quantidade)
+            throws QuantidadeInvalidaException;
 
-    public void carregarEstadoDoSistema() throws IOException;
+    void exibirEstoque(Estoque produto);
+
+    // SALVAR DADOS
+    void salvarEstadoDoSistema() throws IOException;
+
+    void carregarEstadoDoSistema() throws IOException;
 }

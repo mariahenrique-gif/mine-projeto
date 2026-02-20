@@ -1,51 +1,57 @@
 package br.ufpb.MH;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Caixa implements Serializable {
+import java.util.HashMap;
+import java.util.Map;
+
+public class Caixa {
+
     private double saldoAtual;
-    private List<String> historicoLancamentos = new ArrayList<>();
+    private double totalReceitas;
+    private double totalDespesas;
+    private Map<String, Double> movimentacoes;
 
-    public Caixa(double saldoInicial, DiaMes dia) {
+    public Caixa(double saldoInicial) {
         this.saldoAtual = saldoInicial;
-        anotar(dia, "ABERTURA", saldoInicial, 0.0);
+        this.movimentacoes = new HashMap<>();
+    }
+
+    // Registrar compra (saída de dinheiro)
+
+    public void registrarCompra(String descricao, double valorUnitario, int quantidade) {
+        double valorTotal = valorUnitario * quantidade;
+        saldoAtual -= valorTotal;
+        totalDespesas += valorTotal;
+        movimentacoes.put("Compra - " + descricao + " (" + quantidade + " unidades)", valorTotal);
+    }
+
+    // Registrar venda (entrada de dinheiro)
+    public void registrarVenda(String descricao, double valorUnitario, int quantidade) {
+        double valorTotal = valorUnitario * quantidade;
+        saldoAtual += valorTotal;
+        totalReceitas += valorTotal;
+        movimentacoes.put("Venda - " + descricao + " (" + quantidade + " unidades)", valorTotal);
     }
 
     public double getSaldoAtual() {
         return saldoAtual;
     }
 
-    public void setSaldoAtual(double saldoAtual) {
-        this.saldoAtual = saldoAtual;
+    public double getTotalReceitas() {
+        return totalReceitas;
     }
 
-    public List<String> getHistoricoLancamentos() {
-        return historicoLancamentos;
+    public double getTotalDespesas() {
+        return totalDespesas;
     }
 
-    public void setHistoricoLancamentos(List<String> historicoLancamentos) {
-        this.historicoLancamentos = historicoLancamentos;
-    }
-
-    public void registrarEntrada(DiaMes dia, String descricao, double valor) {
-        this.saldoAtual += valor;
-        anotar(dia, descricao, valor, 0.0);
-    }
-
-    public void registrarSaida(DiaMes dia, String desc, double valor) throws SaldoInsuficienteException {
-        if (valor > this.saldoAtual) {
-            throw new SaldoInsuficienteException("Saldo insuficiente! Atual: R$ " + saldoAtual + " | Tentativa: R$ " + valor);
+    public void exibirResumoCaixa() {
+        System.out.println("--- Resumo do Caixa ---");
+        System.out.println("Receitas: R$" + totalReceitas);
+        System.out.println("Despesas: R$" + totalDespesas);
+        System.out.println("Saldo Atual: R$" + saldoAtual);
+        System.out.println("--- Movimentações ---");
+        for (Map.Entry<String, Double> entry : movimentacoes.entrySet()) {
+            System.out.println(entry.getKey() + " | Valor: R$" + entry.getValue());
         }
-        this.saldoAtual -= valor;
-        anotar(dia, desc, 0.0, valor);
     }
-
-    private void anotar(DiaMes dia, String desc, double entrada, double saida) {
-        String registroFormatado = "DATA: " + dia + " | DESC: " + desc +
-                " | ENTRADA: R$ " + entrada + " | SAÍDA: R$ " + saida +
-                " | SALDO: R$ " + this.saldoAtual;
-        this.historicoLancamentos.add(registroFormatado);
-    }
-
 }
