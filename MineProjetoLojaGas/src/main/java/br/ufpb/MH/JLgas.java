@@ -1,93 +1,122 @@
 package br.ufpb.MH;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-public class JLgas {
+public class JLgas implements SistemaJL {
+
     private AgendaDeContatos agenda;
-    private Map<String, Funcionario> mapaFuncionarios;
-    private Map<String, Estoque> mapaEstoque;
     private Caixa caixa;
-    private GerenciadorDeArquivos gerenciador;
+    private SalvaArquivos salva;
 
-    public JLgas() {
+    public JLgas(double saldoInicial, String caminhoArquivo) {
         this.agenda = new AgendaDeContatos();
-        this.mapaFuncionarios = new HashMap<>();
-        this.mapaEstoque = new HashMap<>();
-        this.caixa = new Caixa(0.0, DiaMes.DIA_01);
-        this.gerenciador = new GerenciadorDeArquivos();
+        this.caixa = new Caixa(saldoInicial);
+        this.salva = new SalvaArquivos(caminhoArquivo);
     }
 
-    // --- MÉTODOS FINANCEIROS ---
-
-    public void registrarVenda(DiaMes dia, String produto, double valor, int idFuncionario)
-            throws FuncionarioInexistenteException {
-
-        String idStr = String.valueOf(idFuncionario);
-        if (!mapaFuncionarios.containsKey(idStr)) {
-            throw new FuncionarioInexistenteException("Funcionário ID " + idFuncionario + " não encontrado.");
+    // FINANCEIRO
+    @Override
+    public void registrarGasto(String descricao, double valor) throws SaldoInsuficienteException {
+        if (valor > caixa.getSaldoAtual()) {
+            throw new SaldoInsuficienteException("Saldo insuficiente para registrar gasto.");
         }
-
-        Funcionario f = mapaFuncionarios.get(idStr);
-        f.adicionarVendas(1);
-        caixa.registrarEntrada(dia, "VENDA: " + produto + " | VENDEDOR: " + f.getNome(), valor);
+        caixa.registrarCompra(descricao, valor, 1);
+        try {
+            salva.salvarLinha("Gasto registrado: " + descricao + " | Valor: R$" + valor);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar gasto: " + e.getMessage());
+        }
     }
 
-    public void registrarGasto(DiaMes dia, String descricao, double valor)
-            throws SaldoInsuficienteException {
-        caixa.registrarSaida(dia, descricao, valor);
-    }
-
+    @Override
     public void exibirRelatorioFinanceiro() {
-        for (String registro : caixa.getHistoricoLancamentos()) {
-            System.out.println(registro);
-        }
+        caixa.exibirResumoCaixa();
     }
 
-    // --- MÉTODOS DE CONTATOS ---
-
+    // AGENDA DE CONTATOS
+    @Override
     public void cadastrarContato(Contato c) throws ContatoJaExisteException {
-        agenda.adicionar(c);
+        agenda.adicionarContatoComValidacao(c);
+        try {
+            salva.salvarLinha("Contato cadastrado: " + c.toString());
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar contato: " + e.getMessage());
+        }
     }
 
+    @Override
     public Contato localizarContato(String nome) throws ContatoInexistenteExeption {
-        return agenda.buscar(nome);
+        return agenda.buscarContato(nome);
     }
 
+    @Override
     public boolean excluirContato(String nome) throws ContatoInexistenteExeption {
-        if (!agenda.getMapaContatos().containsKey(nome)) {
-            throw new ContatoInexistenteExeption("Contato não existe.");
+        boolean removido = agenda.removerContato(nome);
+        if (removido) {
+            try {
+                salva.salvarLinha("Contato removido: " + nome);
+            } catch (IOException e) {
+                System.out.println("Erro ao salvar exclusão de contato: " + e.getMessage());
+            }
         }
-        agenda.getMapaContatos().remove(nome);
-        return true;
+        return removido;
     }
 
-    // --- MÉTODOS DE FUNCIONÁRIOS ---
-
-    public void admitirFuncionario(Funcionario f) throws IdDuplicadoException, FuncionarioJaExisteException {
-        if (mapaFuncionarios.containsKey(f.getId())) {
-            throw new IdDuplicadoException("ID já cadastrado.");
-        }
-        mapaFuncionarios.put(f.getId(), f);
+    @Override
+    public void exibirAgendaDeContatos() {
+        agenda.exibirAgenda();
     }
 
-    public Funcionario buscarFuncionario(int id) throws FuncionarioInexistenteException {
-        String idStr = String.valueOf(id);
-        if (!mapaFuncionarios.containsKey(idStr)) {
-            throw new FuncionarioInexistenteException("ID inválido.");
+    // ESTOQUE
+    @Override
+    public void registrarVenda(Estoque produto, int quantidade) throws EstoqueInsuficienteException {
+        produto.registrarVenda(quantidade);
+        caixa.registrarVenda(produto.getProduto(), produto.getPrecoVendaUnitario(), quantidade);
+        try {
+            salva.salvarLinha("Venda registrada: " + produto.getProduto() + " | Quantidade: " + quantidade);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar venda: " + e.getMessage());
         }
-        return mapaFuncionarios.get(idStr);
     }
 
-    // --- MÉTODOS DE PERSISTÊNCIA ---
+    @Override
+    public void registrarCompra(Estoque produto, int quantidade) throws QuantidadeInvalidaException {
+        if (quantidade <= 0) {
+            throw new QuantidadeInvalidaException("Quantidade comprada deve ser maior que zero.");
+        }
+        produto.registrarCompra(quantidade);
+        caixa.registrarCompra(produto.getProduto(), produto.getPrecoCustoUnitario(), quantidade);
+        try {
+            salva.salvarLinha("Compra registrada: " + produto.getProduto() + " | Quantidade: " + quantidade);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar compra: " + e.getMessage());
+        }
+    }
 
+    @Override
+    public void exibirEstoque(Estoque produto) {
+        System.out.println(produto.toString());
+    }
+
+    // SALVAR DADOS
+    @Override
     public void salvarEstadoDoSistema() throws IOException {
-        gerenciador.salvarTudo(
-                agenda.getMapaContatos(),
-                mapaFuncionarios,
-                mapaEstoque,
-                caixa.getHistoricoLancamentos()
-        );
+        List<String> dados = new ArrayList<>();
+        dados.add("--- Estado do Sistema ---");
+        dados.add("Saldo atual: R$" + caixa.getSaldoAtual());
+        dados.add("Receitas: R$" + caixa.getTotalReceitas());
+        dados.add("Despesas: R$" + caixa.getTotalDespesas());
+        salva.salvarLista(dados);
+    }
+
+    @Override
+    public void carregarEstadoDoSistema() throws IOException {
+        List<String> registros = salva.carregar();
+        System.out.println("--- Registros carregados ---");
+        for (String linha : registros) {
+            System.out.println(linha);
+        }
     }
 }
