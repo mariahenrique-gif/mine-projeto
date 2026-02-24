@@ -7,14 +7,14 @@ public class Estoque implements Serializable {
 
     private String produto;
     private int quantidade;
-    private double precoCustoUnitario;
-    private double precoVendaUnitario;
+    private double precoCompraUnidade;
+    private double precoVendaUnidade; // NOVO campo
 
-    public Estoque(String produto, int quantidade, double precoCustoUnitario, double precoVendaUnitario) {
+    public Estoque(String produto, int quantidade, double precoCompraUnidade){
         this.produto = produto;
         this.quantidade = quantidade;
-        this.precoCustoUnitario = precoCustoUnitario;
-        this.precoVendaUnitario = precoVendaUnitario;
+        this.precoCompraUnidade = precoCompraUnidade;
+        this.precoVendaUnidade = precoCompraUnidade; // inicializa igual, pode ser alterado depois
     }
 
     public String getProduto() {
@@ -29,51 +29,31 @@ public class Estoque implements Serializable {
         return quantidade;
     }
 
-    public void setQuantidade(int quantidade) throws QuantidadeInvalidaException {
-        if (quantidade < 0) {
-            throw new QuantidadeInvalidaException("Quantidade não pode ser negativa.");
-        }
+    public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
     }
 
-    public double getPrecoCustoUnitario() {
-        return precoCustoUnitario;
+    public double getPrecoCompraUnidade() {
+        return precoCompraUnidade;
     }
 
-
-    public double getPrecoVendaUnitario() {
-        return precoVendaUnitario;
+    public void setPrecoCompraUnidade(double precoCompraUnidade) {
+        this.precoCompraUnidade = precoCompraUnidade;
     }
 
-    // Métodos
-
-    public double calcularCustoTotal() {
-        return precoCustoUnitario * quantidade;
+    public double getPrecoVendaUnidade() {
+        return precoVendaUnidade;
     }
 
-    public double calcularValorVendaTotal() {
-        return precoVendaUnitario * quantidade;
+    public void setPrecoVendaUnidade(double precoVendaUnidade) {
+        this.precoVendaUnidade = precoVendaUnidade;
     }
 
-    public double calcularLucroUnitario() {
-        return precoVendaUnitario - precoCustoUnitario;
-    }
-
-    public double calcularLucroTotal() {
-        return calcularLucroUnitario() * quantidade;
-    }
-
-    // Atualizar estoque após venda
-    public void registrarVenda(int quantidadeVendida) throws EstoqueInsuficienteException {
-        if (quantidadeVendida > quantidade) {
-            throw new EstoqueInsuficienteException("Estoque insuficiente para a venda de " + quantidadeVendida + " unidades.");
-        }
-        this.quantidade -= quantidadeVendida;
-    }
-
-    // Atualizar estoque após compra
-    public void registrarCompra(int quantidadeComprada) {
-        this.quantidade += quantidadeComprada;
+    public String totalEstoque() {
+        return "Produto: " + produto +
+                " | Quantidade em estoque: " + quantidade +
+                " | Preço compra: R$ " + precoCompraUnidade +
+                " | Preço venda: R$ " + precoVendaUnidade;
     }
 
     @Override
@@ -81,22 +61,23 @@ public class Estoque implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Estoque estoque = (Estoque) o;
         return quantidade == estoque.quantidade &&
-                Double.compare(precoCustoUnitario, estoque.precoCustoUnitario) == 0 &&
-                Double.compare(precoVendaUnitario, estoque.precoVendaUnitario) == 0 &&
+                Double.compare(precoCompraUnidade, estoque.precoCompraUnidade) == 0 &&
+                Double.compare(precoVendaUnidade, estoque.precoVendaUnidade) == 0 &&
                 Objects.equals(produto, estoque.produto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(produto, quantidade, precoCustoUnitario, precoVendaUnitario);
+        return Objects.hash(produto, quantidade, precoCompraUnidade, precoVendaUnidade);
     }
 
     @Override
     public String toString() {
-        return "Produto: " + produto +
-                " | Quantidade: " + quantidade +
-                " | Preço Custo Unitário: R$" + precoCustoUnitario +
-                " | Preço Venda Unitário: R$" + precoVendaUnitario +
-                " | Lucro Unitário: R$" + calcularLucroUnitario();
+        return "Estoque{" +
+                "produto='" + produto + '\'' +
+                ", quantidade=" + quantidade +
+                ", precoCompraUnidade=" + precoCompraUnidade +
+                ", precoVendaUnidade=" + precoVendaUnidade +
+                '}';
     }
 }

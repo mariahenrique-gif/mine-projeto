@@ -1,47 +1,38 @@
 package br.ufpb.MH;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Caixa {
 
     private double saldoAtual;
     private double totalReceitas;
     private double totalDespesas;
-    private Map<String, Double> movimentacoes;
+    private List<String> movimentacoes;
 
     public Caixa(double saldoInicial) {
         this.saldoAtual = saldoInicial;
-        this.movimentacoes = new HashMap<>();
+        this.movimentacoes = new ArrayList<>();
     }
 
-    // Registrar compra (saída de dinheiro)
+    public double getSaldoAtual() { return saldoAtual; }
+    public double getTotalReceitas() { return totalReceitas; }
+    public double getTotalDespesas() { return totalDespesas; }
 
-    public void registrarCompra(String descricao, double valorUnitario, int quantidade) {
-        double valorTotal = valorUnitario * quantidade;
+    public void registrarCompra(Estoque produto, int quantidade) {
+        double valorTotal = produto.getPrecoCompraUnidade() * quantidade;
         saldoAtual -= valorTotal;
         totalDespesas += valorTotal;
-        movimentacoes.put("Compra - " + descricao + " (" + quantidade + " unidades)", valorTotal);
+        produto.setQuantidade(produto.getQuantidade() + quantidade);
+        movimentacoes.add("Compra - " + produto.getProduto() + " (" + quantidade + " unidades) | Valor: R$" + valorTotal);
     }
 
-    // Registrar venda (entrada de dinheiro)
-    public void registrarVenda(String descricao, double valorUnitario, int quantidade) {
-        double valorTotal = valorUnitario * quantidade;
+    public void registrarVenda(Estoque produto, int quantidade) {
+        double valorTotal = produto.getPrecoVendaUnidade() * quantidade;
         saldoAtual += valorTotal;
         totalReceitas += valorTotal;
-        movimentacoes.put("Venda - " + descricao + " (" + quantidade + " unidades)", valorTotal);
-    }
-
-    public double getSaldoAtual() {
-        return saldoAtual;
-    }
-
-    public double getTotalReceitas() {
-        return totalReceitas;
-    }
-
-    public double getTotalDespesas() {
-        return totalDespesas;
+        produto.setQuantidade(produto.getQuantidade() - quantidade);
+        movimentacoes.add("Venda - " + produto.getProduto() + " (" + quantidade + " unidades) | Valor: R$" + valorTotal);
     }
 
     public void exibirResumoCaixa() {
@@ -50,8 +41,8 @@ public class Caixa {
         System.out.println("Despesas: R$" + totalDespesas);
         System.out.println("Saldo Atual: R$" + saldoAtual);
         System.out.println("--- Movimentações ---");
-        for (Map.Entry<String, Double> entry : movimentacoes.entrySet()) {
-            System.out.println(entry.getKey() + " | Valor: R$" + entry.getValue());
+        for (String mov : movimentacoes) {
+            System.out.println(mov);
         }
     }
 }

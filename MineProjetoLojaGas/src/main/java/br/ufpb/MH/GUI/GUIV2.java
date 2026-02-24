@@ -3,19 +3,19 @@ package br.ufpb.MH.GUI;
 import javax.swing.*;
 import java.awt.*;
 
-public class JLgasGUIV2 extends JFrame {
+public class GUIV2 extends JFrame {
     JLabel linha1, linha2;
 
-    ImageIcon logo = new ImageIcon(getClass().getResource("/jlgaslogo.jpg"));
+    ImageIcon logo = new ImageIcon(getClass().getResource("/LogoDistribuidora.png"));
 
-    public JLgasGUIV2(){
-        setTitle("Sistema Empresarial JL Gás");
+    public GUIV2(){
+        setTitle("Sistema de Estoque Distribuidora de Gás");
         setSize(400,400);
         setLocation(150,150);
         setResizable(false);
         getContentPane().setBackground(Color.WHITE);
 
-        linha1= new JLabel("Bem-vindo ao JLgás!",JLabel.CENTER);
+        linha1= new JLabel("Bem-vindo Sistema de Controle de Estoque!",JLabel.CENTER);
         linha1.setForeground(Color.BLUE);
         linha1.setFont(new Font("ser1f",Font.BOLD, 24));
 
@@ -25,7 +25,7 @@ public class JLgasGUIV2 extends JFrame {
         getContentPane().add(linha2);
     }
 public static void main(String[]args){
-        JFrame janela= new JLgasGUIV2();
+        JFrame janela= new GUIV2();
         janela.setVisible(true);
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 }
