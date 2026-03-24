@@ -1,0 +1,15 @@
+br\ufpb\MH\GUI\GUIV2.class
+br\ufpb\MH\GUI\GUI.class
+br\ufpb\MH\Estoque.class
+br\ufpb\MH\SaldoInsuficienteException.class
+br\ufpb\MH\Caixa.class
+controller\VendaGasController.class
+br\ufpb\MH\SistemaLoja.class
+br\ufpb\MH\EstoqueInsuficienteException.class
+br\ufpb\MH\SalvaArquivos.class
+controller\CompraGasController.class
+controller\EstoqueGasController.class
+br\ufpb\MH\QuantidadeInvalidaException.class
+br\ufpb\MH\GUI\GUI$1.class
+br\ufpb\MH\LojaGas.class
+br\ufpb\MH\GUI\GUIV3.class
