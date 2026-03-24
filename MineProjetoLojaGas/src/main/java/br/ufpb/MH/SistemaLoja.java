@@ -13,6 +13,7 @@ public interface SistemaLoja {
     void adicionarProduto(String nome, int quantidade, double precoUnidade);
     void registrarVenda(Estoque produto, int quantidade) throws EstoqueInsuficienteException;
     void registrarCompra(Estoque produto, int quantidade) throws QuantidadeInvalidaException;
+    void pesquisarProdutoPorNome(String nome);
     void exibirEstoque();
 
     // SALVAR/CARREGAR DADOS

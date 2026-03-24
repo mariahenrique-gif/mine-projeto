@@ -1,6 +1,6 @@
 package br.ufpb.MH;
-import br.ufpb.MH.SaldoInsuficienteException;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,14 +68,25 @@ public class LojaGas implements SistemaLoja {
             System.out.println("Erro ao salvar compra: " + e.getMessage());
         }
     }
+    @Override
+    public void pesquisarProdutoPorNome(String nome) {
+        System.out.println("--- Resultado da pesquisa por: " + nome + " ---");
+
+        estoques.values().stream()
+                .filter(e -> e.getProduto().equalsIgnoreCase(nome)) // filtra pelo nome
+                .forEach(e -> System.out.println(e.totalEstoque())); // imprime os resultados
+    }
+
 
     @Override
     public void exibirEstoque() {
         System.out.println("--- Estoque da Loja ---");
-        for (Estoque e : estoques.values()) {
-            System.out.println(e.totalEstoque());
-        }
+
+        estoques.values().stream()
+                .sorted(Comparator.comparing(Estoque::getProduto)) // ordena por nome
+                .forEach(e -> System.out.println(e.totalEstoque())); // imprime cada item
     }
+
     @Override
     public Map<String, Estoque> getEstoques() {
         return estoques;
